@@ -5,12 +5,13 @@ date: "June 12, 2015"
 output: html_document
 ---
 
-#Loading and preprocessing the data
+##Loading and preprocessing the data
 ```{r}
 data <- read.csv("activity.csv")
 ```
 
-#What is mean total number of steps taken per day?
+
+##What is mean total number of steps taken per day?
 
 1. total steps per day
 ```{r}
@@ -19,8 +20,8 @@ tspd <- data.frame(tspd=tapply(data$steps,data$date,sum))
 
 2. plot a histogram 
 ```{r}
-hist(tspd$tspd,breaks=20,xlab="number of steps taken per day", 
-    main="Total number of steps taken each day", col="green")
+hist(tspd$tspd,breaks=50,xlab="number of steps taken per day", 
+    main="Total number of steps taken each day", col=rgb(1,0,0,1/4))
 ```
 
 3. mean and median of the total number of steps taken per day
@@ -29,3 +30,72 @@ mean(tspd$tspd,na.rm=T)
 median(tspd$tspd,na.rm=T)
 ```
 
+
+##What is the average daily activity pattern?
+1. total steps per day and interval
+```{r}
+tspdi <- data.frame(tapply(data$steps,list(data$date,data$interval),sum)) 
+tspdi_avr <- data.frame(average=colMeans(tspdi,na.rm=T))
+plot(tspdi_avr$average, type="l",main="average daily steps",xlab="interval",ylab="frequency")
+```
+
+2. which interval contains the maximum number of steps?
+Change order (high --> low); the colum number shown below contains the highest value
+```{r}
+head(order(tspdi_avr,decreasing=T))
+```
+
+
+##Imputing missing values
+1. total number of missing values in the dataset 
+```{r}
+sum(is.na(data$steps))
+```
+
+2. filling in all of the missing values in the dataset & 3. create a new dataset taht is equal to the original dataset but with the missing data filled in 
+
+Using mean of interval to fill the missing values
+```{r}
+data_fill <- data
+data_fill$steps <- ifelse(is.na(data_fill$steps)==T,tspdi_avr$average,data$steps)
+```
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+total number of steps per day
+```{r}
+tspd_fill <- data.frame(tspd=tapply(data_fill$steps,data_fill$date,sum)) 
+```
+
+Compare the two plots
+
+```{r echo=FALSE, results="hide", message=FALSE}
+hist2 <- hist(tspd_fill$tspd,breaks=50,col=rgb(0,0,1,1/4),xlab="number of steps taken per day (NA filled)", main="Total number of steps taken each day")
+
+hist1 <- hist(tspd$tspd,breaks=50, col=rgb(1,0,0,1/4), xlab="number of steps taken per day (Original)", main="Total number of steps taken each day")  
+```
+
+Plot the two in one graph
+```{r}
+plot(hist2, col=rgb(0,0,1,1/4),xlab="number of steps taken per day", 
+    main="Total number of steps taken each day")  
+plot(hist1, col=rgb(1,0,0,1/4),add=T) 
+legend("topright", legend = c("Original data", "Filled data"),
+       bg = "transparent", fill = c(rgb(0,0,1,1/4),rgb(1,0,0,1/4)))
+```
+
+mean and median
+```{r}
+mean(tspd_fill$tspd,na.rm=T)
+median(tspd_fill$tspd,na.rm=T)
+```
+
+The original data's mean and median are;
+```{r}
+mean(tspd$tspd,na.rm=T)
+median(tspd$tspd,na.rm=T)
+```
+
+
+Since the compliment was done by filling in the average value, the mean and median values are almsot identical between the original and the filled data.
+However, the comparison graph shows that there is a big gap between the two data. The gap is seen around the mean of the number of trips teken per day, since, again, the compliment was done by using the averaged numbers. The filling approach taken in this assignment has a minimal effect to the mean and median of the data; however, it might overestimate some cases, espeially cases with the average number of steps.
