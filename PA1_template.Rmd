@@ -11,14 +11,21 @@ data <- read.csv("activity.csv")
 ```
 
 #What is mean total number of steps taken per day?
+
 1. total steps per day
 ```{r}
 tspd <- data.frame(tspd=tapply(data$steps,data$date,sum)) 
 ```
+
 2. plot a histogram 
 ```{r}
 hist(tspd$tspd,breaks=20,xlab="number of steps taken per day", 
     main="Total number of steps taken each day", col="green")
 ```
-3. 
+
+3. mean and median of the total number of steps taken per day
+```{r}
+mean(tspd$tspd,na.rm=T)
+median(tspd$tspd,na.rm=T)
+```
 
