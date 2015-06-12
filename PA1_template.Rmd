@@ -32,7 +32,7 @@ median(tspd$tspd,na.rm=T)
 
 
 ##What is the average daily activity pattern?
-1. total steps per day and interval
+1. calculate average steps by interval
 ```{r}
 tspdi <- data.frame(tapply(data$steps,list(data$date,data$interval),sum)) 
 tspdi_avr <- data.frame(average=colMeans(tspdi,na.rm=T))
@@ -40,11 +40,13 @@ plot(tspdi_avr$average, type="l",main="average daily steps",xlab="interval",ylab
 ```
 
 2. which interval contains the maximum number of steps?
+
 Change order (high --> low); the colum number shown below contains the highest value
 ```{r}
-head(order(tspdi_avr,decreasing=T))
+ord <- order(tspdi_avr,decreasing=T)
+ord1 <- ord[1]
 ```
-
+The `r ord1` th interval contains the maximum number of steps
 
 ##Imputing missing values
 1. total number of missing values in the dataset 
@@ -70,9 +72,9 @@ tspd_fill <- data.frame(tspd=tapply(data_fill$steps,data_fill$date,sum))
 Compare the two plots
 
 ```{r echo=FALSE, results="hide", message=FALSE}
-hist2 <- hist(tspd_fill$tspd,breaks=50,col=rgb(0,0,1,1/4),xlab="number of steps taken per day (NA filled)", main="Total number of steps taken each day")
+hist2 <- hist(tspd_fill$tspd,breaks=50,col=rgb(0,0,1,1/4),xlab="number of steps taken per day", main="Total number of steps taken each day  (NA filled)")
 
-hist1 <- hist(tspd$tspd,breaks=50, col=rgb(1,0,0,1/4), xlab="number of steps taken per day (Original)", main="Total number of steps taken each day")  
+hist1 <- hist(tspd$tspd,breaks=50, col=rgb(1,0,0,1/4), xlab="number of steps taken per day", main="Total number of steps taken each day (Original)")  
 ```
 
 Plot the two in one graph
@@ -80,7 +82,7 @@ Plot the two in one graph
 plot(hist2, col=rgb(0,0,1,1/4),xlab="number of steps taken per day", 
     main="Total number of steps taken each day")  
 plot(hist1, col=rgb(1,0,0,1/4),add=T) 
-legend("topright", legend = c("Original data", "Filled data"),
+legend("topright", legend = c("Filled data","Original data"),
        bg = "transparent", fill = c(rgb(0,0,1,1/4),rgb(1,0,0,1/4)))
 ```
 
@@ -97,5 +99,6 @@ median(tspd$tspd,na.rm=T)
 ```
 
 
-Since the compliment was done by filling in the average value, the mean and median values are almsot identical between the original and the filled data.
+Interpretation  
+Since the compliment was done by using the average values of the original data, the mean and median values are almsot identical between the original and the filled data.
 However, the comparison graph shows that there is a big gap between the two data. The gap is seen around the mean of the number of trips teken per day, since, again, the compliment was done by using the averaged numbers. The filling approach taken in this assignment has a minimal effect to the mean and median of the data; however, it might overestimate some cases, espeially cases with the average number of steps.
